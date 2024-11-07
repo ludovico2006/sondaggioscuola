@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sondaggio di Gradimento Scolastico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #E83D37;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e0/Liceo_Grigoletti.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .container {
+            position: fixed; /* Fisso rispetto alla finestra */
+            top: 50%; /* Posiziona al centro verticalmente */
+            left: 50%; /* Posiziona al centro orizzontalmente */
+            transform: translate(-50%, -50%); /* Centra esattamente il div */
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1000; /* Garantisce che il contenitore rimanga sopra altri elementi */
+        }
+        h1 {
+            display: flex;
+            align-items: center;
+            color: black;
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        h1 img {
+            width: 80px;
+            height: auto;
+            margin-right: 20px;
+        }
+        .question {
+            margin: 15px 0;
+            display: none;
+            text-align: left;
+        }
+        .options {
+            margin-top: 10px;
+            padding-left: 20px;
+            text-align: left;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px;
+            background-color: #E83D37;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+            margin: 0 5px;
+        }
+        button:hover {
+            background-color: #C63D37;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .thank-you-container {
+            display: none; /* Nascosto inizialmente */
+            text-align: center;
+            background-color: white; /* Impostiamo lo sfondo su bianco */
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <img src="https://img.gothru.org/535/6584318693777140845/overlay/assets/20201206152124.QBCaZn.png?save=optimize" alt="Logo Grigoletti">
+            Sondaggio di Gradimento Scolastico
+        </h1>
+
+        <form id="survey-form">
+            <div class="question" id="question1">
+                <label>1. Che immagine avevi del Grigoletti prima di Scuola Aperta?</label>
+                <div class="options">
+                    <input type="radio" id="dream" name="image" value="La scuola dei sogni">
+                    <label for="dream">La scuola dei sogni</label><br>
+                    <input type="radio" id="no-idea" name="image" value="Non avevo alcuna idea">
+                    <label for="no-idea">Non avevo alcuna idea</label><br>
+                    <input type="radio" id="hell" name="image" value="Un inferno">
+                    <label for="hell">Un inferno</label>
+                </div>
+            </div>
+
+            <div class="question" id="question2">
+                <label>2. Sei soddisfatto della partecipazione a scuola aperta?</label>
+                <div class="options">
+                    <input type="radio" id="yes" name="satisfaction" value="Si">
+                    <label for="yes">Si</label><br>
+                    <input type="radio" id="mixed" name="satisfaction" value="Qualcosa mi è piaciuto, qualcosa meno">
+                    <label for="mixed">Qualcosa mi è piaciuto, qualcosa meno</label><br>
+                    <input type="radio" id="no" name="satisfaction" value="No">
+                    <label for="no">No</label>
+                </div>
+            </div>
+
+            <div class="question" id="question3">
+                <label>3. Ti iscriveresti?</label>
+                <div class="options">
+                    <input type="radio" id="enroll-yes" name="enroll" value="Si">
+                    <label for="enroll-yes">Si</label><br>
+                    <input type="radio" id="think" name="enroll" value="Ci devo pensare">
+                    <label for="think">Ci devo pensare</label><br>
+                    <input type="radio" id="enroll-no" name="enroll" value="No">
+                    <label for="enroll-no">No</label>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button type="button" id="prev-button" style="display:none;">Precedente</button>
+                <button type="button" id="next-button" disabled>Invia</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Schermata di ringraziamento -->
+    <div class="thank-you-container">
+        <h1>
+            <img src="https://img.gothru.org/535/6584318693777140845/overlay/assets/20201206152124.QBCaZn.png?save=optimize" alt="Logo Grigoletti">
+            Grazie per aver risposto
+        </h1>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        const questions = document.querySelectorAll('.question');
+        const nextButton = document.getElementById('next-button');
+        const prevButton = document.getElementById('prev-button');
+        const thankYouContainer = document.querySelector('.thank-you-container');
+        const surveyContainer = document.querySelector('.container');
+
+        // Funzione per controllare se è stata selezionata una risposta
+        function isQuestionAnswered() {
+            const currentQuestionElement = questions[currentQuestion];
+            const radios = currentQuestionElement.querySelectorAll('input[type="radio"]');
+            return Array.from(radios).some(radio => radio.checked);
+        }
+
+        // Funzione per abilitare/disabilitare il pulsante "Invia"
+        function updateNextButton() {
+            if (isQuestionAnswered()) {
+                nextButton.disabled = false;
+            } else {
+                nextButton.disabled = true;
+            }
+        }
+
+        function showQuestion(index) {
+            questions.forEach((question, i) => {
+                question.style.display = (i === index) ? 'block' : 'none';
+            });
+            prevButton.style.display = (index === 0) ? 'none' : 'block';
+            updateNextButton(); // Abilita o disabilita il pulsante "Invia"
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (isQuestionAnswered()) {
+                if (currentQuestion < questions.length - 1) {
+                    currentQuestion++;
+                    showQuestion(currentQuestion);
+                } else {
+                    // Mostra la schermata di ringraziamento
+                    surveyContainer.style.display = 'none';
+                    thankYouContainer.style.display = 'block';
+                }
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        // Aggiungi evento per le risposte alle domande
+        questions.forEach((question) => {
+            const radios = question.querySelectorAll('input[type="radio"]');
+            radios.forEach((radio) => {
+                radio.addEventListener('change', updateNextButton);
+            });
+        });
+
+        // Ritorna al sondaggio e azzera le risposte
+        thankYouContainer.addEventListener('click', () => {
+            // Azzera le risposte selezionate
+            const allRadios = document.querySelectorAll('input[type="radio"]');
+            allRadios.forEach(radio => radio.checked = false);
+
+            currentQuestion = 0;
+            thankYouContainer.style.display = 'none';
+            surveyContainer.style.display = 'block';
+            showQuestion(currentQuestion);
+        });
+
+        // Mostra la prima domanda all'avvio
+        showQuestion(currentQuestion);
+    </script>
+
+</body>
+</html>
