@@ -1,2 +1,5 @@
 Username: liceogrigoletti
 Password: hEW6ruJnHvFb
+Domanda1: dream, no-idea, hell
+Domanda2: satisfaction-yes, satisfaction-mixed, satisfaction-no
+Domanda3: enroll-yes, enroll-think, enroll-no
